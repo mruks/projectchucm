@@ -2,3 +2,16 @@ name: ProjectChucm
 main: io.github.mruks.projectchucm.ProjectChucm
 version: 0.0.1-SNAPSHOT
 author: MrUks
+commands:
+	teamup:
+		description: Clears all teams and generates new random teams
+		permission: UHC.teamup
+		permission-message: You do not have /<permission>
+		usage: Syntax error! Perhaps you meant /teamup <numberOfTeams> 
+
+permissions:
+	UHC.*:	
+		description: Gives access to all UHC commands 
+	teamup:
+		description: Allows you to generate teams
+		default: op

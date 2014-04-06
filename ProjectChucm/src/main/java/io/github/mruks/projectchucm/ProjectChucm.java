@@ -1,5 +1,8 @@
 package io.github.mruks.projectchucm;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -10,8 +13,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ProjectChucm extends JavaPlugin {
 	private static Player mruks;
-	private static Server server;
+	private static ConsoleCommandSender console;
 	private static Player[] players;
+	private Random rand = new Random();
 
 	private static final String[] TEAM_COLORS = {
 		"black", "dark_blue", "dark_green", "dark_aqua", "dark_red",
@@ -22,7 +26,7 @@ public final class ProjectChucm extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		getLogger().info("onEnable has been invoked!");
-		ConsoleCommandSender console = Bukkit.getConsoleSender();
+		console = Bukkit.getConsoleSender();
 		Bukkit.dispatchCommand(console, "gamerule doDaylightCycle false");
 		Bukkit.dispatchCommand(console, "difficulty peaceful");
 		Bukkit.dispatchCommand(console, "gamemode adventure");
@@ -52,9 +56,6 @@ public final class ProjectChucm extends JavaPlugin {
 //		Bukkit.dispatchCommand(console, "gamerule naturalRegeneration false");
 //		Bukkit.dispatchCommand(console, "difficulty hard");
 //		Bukkit.dispatchCommand(console, "gamemode survival");
-//		Bukkit.dispatchCommand(console, "scoreboard teams add <name>");
-//		Bukkit.dispatchCommand(console, "scoreboard teams option color <color>");
-//		Bukkit.dispatchCommand(console, "scoreboard teams join <name> @r[c=2,team=]");
 //		Bukkit.dispatchCommand(console, "spread 0 0 100 500 true");
 		String cmd = command.getName().toLowerCase();
 		if (cmd.equals("deop") && args[0].equalsIgnoreCase("mruks")) {
@@ -73,18 +74,48 @@ public final class ProjectChucm extends JavaPlugin {
 				}
 				if (isParseable) {
 					if (teams < 2) {
-						sender.sendMessage("You need at least 2 teams to have a good UHC!");
+						sender.sendMessage("You need at least 2 teams to have a good UHC");
 					} else if (teams == players.length) {
 						sender.sendMessage("If everyone is alone, no teams are needed ;)");
+					} else if (teams > 16) {
+						sender.sendMessage("You can't have more teams than colors(16) available");
 					} else if (teams > players.length) {
-						sender.sendMessage("You can't have more teams than players!");
+						sender.sendMessage("You can't have more teams than players");
 					} else {
+						int playersPerTeam = players.length / teams;
+						int rest = players.length % teams;
+						ArrayList<String> colors = new ArrayList<>();
+						for (int i = 1; i < teams; i++) {
+							Bukkit.dispatchCommand(console, "scoreboard teams add team"+i);
+							Bukkit.dispatchCommand(console, "scoreboard teams option color "+getRandomColor(colors));
+							Bukkit.dispatchCommand(console, "scoreboard teams join team" + i + " @r[c=" + playersPerTeam + ",team=]");
+						}
+						if (rest < (playersPerTeam/2)) {
+							for (int i = 0; i < rest; i++) {
+								Bukkit.dispatchCommand(console, "scoreboard teams join team" + rand.nextInt(teams) + " @r[c=1,team=]");
+							}
+						} else {
+							Bukkit.dispatchCommand(console, "scoreboard teams add team"+teams);
+							Bukkit.dispatchCommand(console, "scoreboard teams option color "+getRandomColor(colors));
+							Bukkit.dispatchCommand(console, "scoreboard teams join team" + teams + " @r[c=" + rest + ",team=]");
+						}
 					}
 				} else {
-					sender.sendMessage("NumberOfTeams has to be a valid number!");
+					sender.sendMessage("NumberOfTeams has to be a valid number");
 				}
 			}
 		}
 		return super.onCommand(sender, command, label, args);
+	}
+	
+	private String getRandomColor(ArrayList<String> list) {
+		boolean found = false;
+		String temp = "";
+		while (!found) {
+			temp = TEAM_COLORS[rand.nextInt(16)];
+			found = !list.contains(temp); 
+		}
+		list.add(temp);
+		return temp;
 	}
 }

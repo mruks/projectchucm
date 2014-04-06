@@ -49,8 +49,7 @@ public final class ProjectChucm extends JavaPlugin {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 //		Bukkit.dispatchCommand(console, "time set day");
 //		Bukkit.dispatchCommand(console, "gamerule doDaylightCycle true");
 //		Bukkit.dispatchCommand(console, "gamerule naturalRegeneration false");

@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ProjectChucm extends JavaPlugin {
-	private static Player mruks;
-	private static ConsoleCommandSender console;
-	private static Player[] players;
+	private Player mruks;
+	private ConsoleCommandSender console;
+	private Player[] players;
 	private Random rand = new Random();
 
 	private static final String[] TEAM_COLORS = {

@@ -3,9 +3,9 @@ main: io.github.mruks.projectchucm.ProjectChucm
 version: 0.0.1-SNAPSHOT
 author: MrUks
 commands:
-	teamup:
-		description: Clears all teams and generates new random teams
-		usage: /teamup <numberOfTeams>
-	genborders:
-		description: generates bedrock borders for the map
-		usage: /genborders <borderLength>
+ teamup:
+  description: Clears all teams and generates new random teams
+  usage: /teamup <numberOfTeams>
+ genborders:
+  description: generates bedrock borders for the map
+  usage: /genborders <borderLength>

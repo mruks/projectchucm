@@ -5,24 +5,7 @@ author: MrUks
 commands:
 	teamup:
 		description: Clears all teams and generates new random teams
-		permission: UHC.teamup
-		permission-message: You do not have /<permission>
-		usage: Syntax error! Perhaps you meant /teamup <numberOfTeams>
+		usage: /teamup <numberOfTeams>
 	genborders:
 		description: generates bedrock borders for the map
-		permission: UHC.genborders
-		permission-message: You do not have /<permission>
-		usage: Syntax error! Perhaps you meant /genborders <borderLength>
-
-permissions:
-	UHC.*:	
-		description: Gives access to all UHC commands
-		children:
-			UHC.teamup: true
-			UHC.genborders: true
-	teamup:
-		description: Allows you to generate teams
-		default: op
-	genborders:
-		description: Allows you to generate borders
-		default: op
+		usage: /genborders <borderLength>

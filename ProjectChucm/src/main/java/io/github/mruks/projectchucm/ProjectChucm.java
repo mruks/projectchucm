@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -62,10 +61,10 @@ public final class ProjectChucm extends JavaPlugin {
 //		} else if (cmd.equals("")) {
 		} else if (cmd.equals("teamup")) {
 			if (args.length < 1) {
-				sender.sendMessage("missing numberOfTeams parameter!");
+				sender.sendMessage("missing numberOfTeams parameter");
 			} else {
 				int teams = 0;
-				boolean isParseable = true;
+				boolean isParseable = true;				
 				try {
 					teams = Integer.parseInt(args[0]);
 				} catch(NumberFormatException e) {
@@ -85,7 +84,7 @@ public final class ProjectChucm extends JavaPlugin {
 						int rest = players.length % teams;
 						ArrayList<String> colors = new ArrayList<>();
 						for (int i = 1; i < teams; i++) {
-							Bukkit.dispatchCommand(console, "scoreboard teams add team"+i);
+							Bukkit.dispatchCommand(console, "scoreboard teams add team" + i);
 							Bukkit.dispatchCommand(console, "scoreboard teams option color "+getRandomColor(colors));
 							Bukkit.dispatchCommand(console, "scoreboard teams join team" + i + " @r[c=" + playersPerTeam + ",team=]");
 						}
@@ -94,7 +93,7 @@ public final class ProjectChucm extends JavaPlugin {
 								Bukkit.dispatchCommand(console, "scoreboard teams join team" + rand.nextInt(teams) + " @r[c=1,team=]");
 							}
 						} else {
-							Bukkit.dispatchCommand(console, "scoreboard teams add team"+teams);
+							Bukkit.dispatchCommand(console, "scoreboard teams add team" + teams);
 							Bukkit.dispatchCommand(console, "scoreboard teams option color "+getRandomColor(colors));
 							Bukkit.dispatchCommand(console, "scoreboard teams join team" + teams + " @r[c=" + rest + ",team=]");
 						}
@@ -103,6 +102,40 @@ public final class ProjectChucm extends JavaPlugin {
 					sender.sendMessage("NumberOfTeams has to be a valid number");
 				}
 			}
+		} else if (cmd.equals("genborders")) {
+			if (args.length < 1) {
+				sender.sendMessage("missing borderLength parameter");
+			} else {
+				int border = 0;
+				boolean isParseable = true;				
+				try {
+					border = Integer.parseInt(args[0]);
+				} catch(NumberFormatException e) {
+					isParseable = false;
+				}
+				if (isParseable) {
+					if (border < 50) {
+						sender.sendMessage("UHC isn't interesting in a map smaller than 50 by 50");
+					} else {
+						for (int i = -border; i <= border; i++) {
+							for (int j = 0; j < 256; j++) {
+								Bukkit.dispatchCommand(console, "setblock " +
+							i + " " + j + " " + border + " minecraft:bedrock");
+								Bukkit.dispatchCommand(console, "setblock " +
+							i + " " + j + " " + (-border) + " minecraft:bedrock");
+								Bukkit.dispatchCommand(console, "setblock " +
+							border + " " + j + " " + i + " minecraft:bedrock");
+								Bukkit.dispatchCommand(console, "setblock " +
+							(-border) + " " + j + " " + i + " minecraft:bedrock");
+							}
+						}
+					}
+				} else {
+					sender.sendMessage("borderLength has to be a valid number");
+				}
+			}
+		} else {
+			sender.sendMessage("NumberOfTeams has to be a valid number");
 		}
 		return super.onCommand(sender, command, label, args);
 	}

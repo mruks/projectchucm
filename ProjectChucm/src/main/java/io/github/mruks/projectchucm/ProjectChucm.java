@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -102,7 +103,7 @@ public final class ProjectChucm extends JavaPlugin {
 					sender.sendMessage("NumberOfTeams has to be a valid number");
 				}
 			}
-		} else if (cmd.equals("genborders")) {
+		} else if (cmd.equals("genborders") && !(sender instanceof Player)) {
 			if (args.length < 1) {
 				sender.sendMessage("missing borderLength parameter");
 			} else {
@@ -117,18 +118,33 @@ public final class ProjectChucm extends JavaPlugin {
 					if (border < 50) {
 						sender.sendMessage("UHC isn't interesting in a map smaller than 50 by 50");
 					} else {
-						for (int i = -border; i <= border; i++) {
-							for (int j = 0; j < 256; j++) {
-								Bukkit.dispatchCommand(console, "setblock " +
-							i + " " + j + " " + border + " minecraft:bedrock");
-								Bukkit.dispatchCommand(console, "setblock " +
-							i + " " + j + " " + (-border) + " minecraft:bedrock");
-								Bukkit.dispatchCommand(console, "setblock " +
-							border + " " + j + " " + i + " minecraft:bedrock");
-								Bukkit.dispatchCommand(console, "setblock " +
-							(-border) + " " + j + " " + i + " minecraft:bedrock");
+						Bukkit.dispatchCommand(console, "kick @a generating borders for UHC is very laginducing, you'll only make it worse :p");
+						World world = Bukkit.getWorld(Bukkit.getWorldType());
+						int chunk = (int)(border/16)*16;
+						for (int i = (chunk < border ? -(chunk += 16) : -chunk); i < (chunk+16); i+=16) {
+							world.loadChunk(i,border);
+							world.loadChunk(i,-border);
+							world.loadChunk(border,i);
+							world.loadChunk(-border,i);
+							for (int i2 = i; i2 < i+16; i2++) {
+								for (int j = 0; j < 256; j++) {
+									Bukkit.dispatchCommand(console, "setblock " +
+								i2 + " " + j + " " + border + " minecraft:bedrock");
+									Bukkit.dispatchCommand(console, "setblock " +
+								i2 + " " + j + " " + (-border) + " minecraft:bedrock");
+									Bukkit.dispatchCommand(console, "setblock " +
+								border + " " + j + " " + i2 + " minecraft:bedrock");
+									Bukkit.dispatchCommand(console, "setblock " +
+								(-border) + " " + j + " " + i2 + " minecraft:bedrock");
+								}
 							}
+							world.unloadChunk(i,border);
+							world.unloadChunk(i,-border);
+							world.unloadChunk(border,i);
+							world.unloadChunk(-border,i);
 						}
+						sender.sendMessage("Server needs to restart");
+						Bukkit.dispatchCommand(console, "stop");
 					}
 				} else {
 					sender.sendMessage("borderLength has to be a valid number");

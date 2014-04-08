@@ -1,6 +1,6 @@
 name: ProjectChucm
 main: io.github.mruks.projectchucm.ProjectChucm
-version: 0.0.1-SNAPSHOT
+version: 0.5-SNAPSHOT
 author: MrUks
 commands:
  teamup:

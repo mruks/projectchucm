@@ -1,11 +1,14 @@
 name: ProjectChucm
 main: io.github.mruks.projectchucm.ProjectChucm
-version: 0.5-SNAPSHOT
+version: 0.7.0-SNAPSHOT
 author: MrUks
 commands:
+ prep:
+  description: Preps the server
+  usage: /prep <borderLength>
  teamup:
   description: Clears all teams and generates new random teams
   usage: /teamup <numberOfTeams>
- genborders:
-  description: generates bedrock borders for the map
-  usage: /genborders <borderLength>
+ genmap:
+  description: generates bedrock borders for the map if the server has been prepped
+  usage: /genmap

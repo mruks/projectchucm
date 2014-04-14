@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,10 +14,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ProjectChucm extends JavaPlugin {
-	private Player mruks;
 	private ConsoleCommandSender console;
-	private Player[] players;
 	private Random rand = new Random();
+	private int border = 0;
+	private int plusBorder = 0;
+	private int minBorder = 0;
 
 	private static final String[] TEAM_COLORS = {
 		"black", "dark_blue", "dark_green", "dark_aqua", "dark_red",
@@ -27,20 +30,7 @@ public final class ProjectChucm extends JavaPlugin {
 	public void onEnable() {
 		getLogger().info("onEnable has been invoked!");
 		console = Bukkit.getConsoleSender();
-		Bukkit.dispatchCommand(console, "gamerule doDaylightCycle false");
-		Bukkit.dispatchCommand(console, "difficulty peaceful");
-		Bukkit.dispatchCommand(console, "gamemode adventure");
-		Bukkit.dispatchCommand(console, "scoreboard objectives add sb health");
-		Bukkit.dispatchCommand(console, "scoreboard objectives setdisplay list sb");
-		players = Bukkit.getServer().getOnlinePlayers();
-		mruks = null;
-		for (Player player : players) {
-			player.setFlying(true);
-			if (player.getName().equalsIgnoreCase("mruks")) {
-				mruks = player;
-				mruks.setOp(true);
-			}
-		}
+		Bukkit.setDefaultGameMode(GameMode.ADVENTURE);
 	}
  
 	@Override
@@ -56,10 +46,38 @@ public final class ProjectChucm extends JavaPlugin {
 //		Bukkit.dispatchCommand(console, "difficulty hard");
 //		Bukkit.dispatchCommand(console, "gamemode survival");
 //		Bukkit.dispatchCommand(console, "spread 0 0 100 500 true");
-		String cmd = command.getName().toLowerCase();
-		if (cmd.equals("deop") && args[0].equalsIgnoreCase("mruks")) {
-			sender.sendMessage("As a creator of this plugin, MrUks can't be deoped :p");
 //		} else if (cmd.equals("")) {
+		String cmd = command.getName().toLowerCase();
+		if (cmd.equals("prep")) {
+			if (args.length < 1) {
+				sender.sendMessage("missing borderLength parameter");
+			} else {
+				if ((sender instanceof Player) && ((Player)sender).isOp()) {
+					boolean isParseable = true;				
+					try {
+						border = Integer.parseInt(args[0]);
+					} catch(NumberFormatException e) {
+						isParseable = false;
+					}
+					if (isParseable && border > 100) {
+						Bukkit.dispatchCommand(console, "gamerule doDaylightCycle false");
+						Bukkit.dispatchCommand(console, "time set 0");
+						Bukkit.dispatchCommand(console, "difficulty peaceful");
+						Bukkit.dispatchCommand(console, "scoreboard objectives add sb health");
+						Bukkit.dispatchCommand(console, "scoreboard objectives setdisplay list sb");
+						Bukkit.dispatchCommand(console, "gamemode creative " + sender.getName());
+						border += 2;
+						minBorder = -(border/2);
+						plusBorder = border + minBorder;
+						((Player)sender).setFlying(true);
+						Bukkit.dispatchCommand(console, "tp " + sender.getName() + " " + minBorder + " 200 " + minBorder);
+						sender.sendMessage("now don't move and type /genmap");
+					} else {
+						sender.sendMessage("border is an invalid number or is to small (i.e. smaller than 100)");
+						border = 0;
+					}
+				}
+			}
 		} else if (cmd.equals("teamup")) {
 			if (args.length < 1) {
 				sender.sendMessage("missing numberOfTeams parameter");
@@ -72,6 +90,7 @@ public final class ProjectChucm extends JavaPlugin {
 					isParseable = false;
 				}
 				if (isParseable) {
+					Player[] players = Bukkit.getServer().getOnlinePlayers();
 					if (teams < 2) {
 						sender.sendMessage("You need at least 2 teams to have a good UHC");
 					} else if (teams == players.length) {
@@ -103,55 +122,64 @@ public final class ProjectChucm extends JavaPlugin {
 					sender.sendMessage("NumberOfTeams has to be a valid number");
 				}
 			}
-		} else if (cmd.equals("genborders") && !(sender instanceof Player)) {
-			if (args.length < 1) {
-				sender.sendMessage("missing borderLength parameter");
-			} else {
-				int border = 0;
-				boolean isParseable = true;				
-				try {
-					border = Integer.parseInt(args[0]);
-				} catch(NumberFormatException e) {
-					isParseable = false;
-				}
-				if (isParseable) {
-					if (border < 50) {
-						sender.sendMessage("UHC isn't interesting in a map smaller than 50 by 50");
-					} else {
-						Bukkit.dispatchCommand(console, "kick @a generating borders for UHC is very laginducing, you'll only make it worse :p");
-						World world = Bukkit.getWorld(Bukkit.getWorldType());
-						int chunk = (int)(border/16)*16;
-						for (int i = (chunk < border ? -(chunk += 16) : -chunk); i < (chunk+16); i+=16) {
-							world.loadChunk(i,border);
-							world.loadChunk(i,-border);
-							world.loadChunk(border,i);
-							world.loadChunk(-border,i);
-							for (int i2 = i; i2 < i+16; i2++) {
-								for (int j = 0; j < 256; j++) {
-									Bukkit.dispatchCommand(console, "setblock " +
-								i2 + " " + j + " " + border + " minecraft:bedrock");
-									Bukkit.dispatchCommand(console, "setblock " +
-								i2 + " " + j + " " + (-border) + " minecraft:bedrock");
-									Bukkit.dispatchCommand(console, "setblock " +
-								border + " " + j + " " + i2 + " minecraft:bedrock");
-									Bukkit.dispatchCommand(console, "setblock " +
-								(-border) + " " + j + " " + i2 + " minecraft:bedrock");
-								}
-							}
-							world.unloadChunk(i,border);
-							world.unloadChunk(i,-border);
-							world.unloadChunk(border,i);
-							world.unloadChunk(-border,i);
-						}
-						sender.sendMessage("Server needs to restart");
-						Bukkit.dispatchCommand(console, "stop");
-					}
+		} else if (cmd.equals("genmap")) {
+			if ((sender instanceof Player) && ((Player)sender).isOp()) {
+				if (border == 0) {
+					sender.sendMessage("map hasn't been prepped");
 				} else {
-					sender.sendMessage("borderLength has to be a valid number");
+					((Player)sender).setFlying(true);
+					Bukkit.dispatchCommand(console, "tp " + sender.getName() + " " + minBorder + " 200 " + minBorder);
+					World world = Bukkit.getWorld("world");
+					if (world.getChunkAt(minBorder, minBorder).isLoaded()) {
+						world.loadChunk(minBorder,minBorder);
+						for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+							Bukkit.dispatchCommand(console, "kick " + p.getName() + " generating borders for UHC is very laginducing, you'll only make it worse :p\nPlease don't rejoin the server until it succesfully termimnates itself!");
+						}
+						//gen actual borders
+						console.sendMessage("Starting border generation: ...");
+						int fullPercent = border*1024;
+						int percent = 0;
+						for (int i = minBorder; i <= plusBorder; i++) {
+							world.loadChunk(i,minBorder,false);
+							for (int j = 0; j < 256; j++) {
+								world.getBlockAt(i,j,minBorder).setType(Material.BEDROCK);
+							}
+							percent+=256;
+							if (i%10==0) console.sendMessage("Border generation at: " + (int)(percent*100/fullPercent) + "%");
+						}
+						for (int i = minBorder; i <= plusBorder; i++) {
+							world.loadChunk(plusBorder,i,false);
+							for (int j = 0; j < 256; j++) {
+								world.getBlockAt(plusBorder,j,i).setType(Material.BEDROCK);
+							}
+							percent+=256;
+							if (i%10==0) console.sendMessage("Border generation at: " + (int)(percent*100/fullPercent) + "%");
+						}
+						for (int i = plusBorder; i >= minBorder; i--) {
+							world.loadChunk(i,plusBorder,false);
+							for (int j = 0; j < 256; j++) {
+								world.getBlockAt(i,j,plusBorder).setType(Material.BEDROCK);
+							}
+							percent+=256;
+							if (i%10==0) console.sendMessage("Border generation at: " + (int)(percent*100/fullPercent) + "%");
+						}
+						for (int i = plusBorder; i >= minBorder; i--) {
+							world.loadChunk(minBorder,i,false);
+							for (int j = 0; j < 256; j++) {
+								world.getBlockAt(minBorder,j,i).setType(Material.BEDROCK);
+							}
+							percent+=256;
+							if (i%10==0) console.sendMessage("Border generation at: " + (int)(percent*100/fullPercent) + "%");
+						}
+						console.sendMessage("Server needs to restart");
+						Bukkit.dispatchCommand(console, "stop");
+					} else {
+						sender.sendMessage("tp to " + minBorder + " 100 " + minBorder + "in order for this command to work! That chunk needs to be loaded!");
+					}
 				}
+			} else {
+				sender.sendMessage("This command has to be performed by a logged on OP in order to work");
 			}
-		} else {
-			sender.sendMessage("NumberOfTeams has to be a valid number");
 		}
 		return super.onCommand(sender, command, label, args);
 	}

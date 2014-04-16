@@ -1,6 +1,6 @@
 name: ProjectChucm
 main: io.github.mruks.projectchucm.ProjectChucm
-version: 0.7.0-SNAPSHOT
+version: 0.8.0-SNAPSHOT
 author: MrUks
 commands:
  prep:
@@ -12,3 +12,13 @@ commands:
  genmap:
   description: generates bedrock borders for the map if the server has been prepped
   usage: /genmap
+ ready:
+  description: tells the server that the team is ready. When everyone is ready, a 5 second countdown will start after which UHC mode will start 
+  usage: /ready
+ unready:
+  description: tells the server that the team isn't ready 
+  usage: /unready
+ timer:
+  description: sets the timer for how often the server reminds everyone how long the game has been going
+  usage: /timer
+

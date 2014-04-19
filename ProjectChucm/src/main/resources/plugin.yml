@@ -1,6 +1,6 @@
 name: ProjectChucm
 main: io.github.mruks.projectchucm.ProjectChucm
-version: 0.8.0-SNAPSHOT
+version: 1.0
 author: MrUks
 commands:
  prep:
@@ -20,5 +20,8 @@ commands:
   usage: /unready
  timer:
   description: sets the timer for how often the server reminds everyone how long the game has been going
-  usage: /timer
+  usage: /timer <minuteLength>
+ uhcsetup:
+  description: spreads the teams and waits until every team confirms to be ready
+  usage: /uhcsetup
 
